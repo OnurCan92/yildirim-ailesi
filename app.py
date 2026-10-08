@@ -9,7 +9,7 @@ app = Flask(__name__)
 # Güvenli gizli anahtar
 app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 
-KULLANICI_ADI = "aile"
+KULLANICI_ADI = "Helium"
 AYAR_DOSYASI = "ayarlar.json"
 
 UPLOAD_FOLDER = "uploads"

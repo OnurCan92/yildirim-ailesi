@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 import json
 import os
@@ -21,22 +20,24 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 def ayarlari_oku():
     if not os.path.exists(AYAR_DOSYASI):
-        ayarlar = {
+        return {
             "sifre": "123456"
         }
-
-        with open(AYAR_DOSYASI, "w", encoding="utf-8") as dosya:
-            json.dump(ayarlar, dosya, ensure_ascii=False, indent=4)
-
-        return ayarlar
 
     with open(AYAR_DOSYASI, "r", encoding="utf-8") as dosya:
         return json.load(dosya)
 
 
-def ayarlari_kaydet(ayarlar):
-    with open(AYAR_DOSYASI, "w", encoding="utf-8") as dosya:
-        json.dump(ayarlar, dosya, ensure_ascii=False, indent=4)
+def mevcut_sifre():
+    # Render'da Environment Variable kullanılır
+    render_sifresi = os.environ.get("ADMIN_PASSWORD")
+
+    if render_sifresi:
+        return render_sifresi
+
+    # Bilgisayarda çalışırken ayarlar.json kullanılır
+    ayarlar = ayarlari_oku()
+    return ayarlar["sifre"]
 
 
 def izin_verilen_dosya(dosya_adi):
@@ -91,12 +92,11 @@ def yonetim():
 @app.route("/giris", methods=["GET", "POST"])
 def giris():
     if request.method == "POST":
+
         kullanici = request.form["username"]
         sifre = request.form["password"]
 
-        ayarlar = ayarlari_oku()
-
-        if kullanici == KULLANICI_ADI and sifre == ayarlar["sifre"]:
+        if kullanici == KULLANICI_ADI and sifre == mevcut_sifre():
             session["kullanici"] = kullanici
             return redirect(url_for("yonetim"))
 
@@ -107,6 +107,7 @@ def giris():
 
 @app.route("/fotoğraf-yukle", methods=["POST"])
 def fotograf_yukle():
+
     if "kullanici" not in session:
         return redirect(url_for("giris"))
 
@@ -132,6 +133,7 @@ def fotograf_yukle():
 
 @app.route("/fotoğraf-sil/<filename>", methods=["POST"])
 def fotograf_sil(filename):
+
     if "kullanici" not in session:
         return redirect(url_for("giris"))
 
@@ -148,8 +150,13 @@ def fotograf_sil(filename):
 
 @app.route("/sifre-degistir", methods=["POST"])
 def sifre_degistir():
+
     if "kullanici" not in session:
         return redirect(url_for("giris"))
+
+    # Render'da Environment Variable doğrudan uygulama tarafından değiştirilemez.
+    if os.environ.get("ADMIN_PASSWORD"):
+        return "Şifreyi değiştirmek için Render > Environment > Environment Variables bölümündeki ADMIN_PASSWORD değerini değiştir."
 
     eski_sifre = request.form["eski_sifre"]
     yeni_sifre = request.form["yeni_sifre"]
@@ -167,7 +174,14 @@ def sifre_degistir():
         return "Yeni şifre en az 6 karakter olmalı!"
 
     ayarlar["sifre"] = yeni_sifre
-    ayarlari_kaydet(ayarlar)
+
+    with open(AYAR_DOSYASI, "w", encoding="utf-8") as dosya:
+        json.dump(
+            ayarlar,
+            dosya,
+            ensure_ascii=False,
+            indent=4
+        )
 
     return "Şifre başarıyla değiştirildi!"
 
@@ -180,4 +194,9 @@ def cikis():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 80))
-    app.run(host="0.0.0.0", port=port, debug=False)
+
+    app.run(
+        host="0.0.0.0",
+        port=port,
+        debug=False
+    )

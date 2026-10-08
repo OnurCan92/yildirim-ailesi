@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Yıldırım Ailesi - Anılar</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <nav>
+        <a href="/">Ana Sayfa</a>
+        <a href="/anilar">Anılar</a>
+    </nav>
+
+    <h1>📸 Anılarımız</h1>
+
+    <p>Güzel anılarımız ❤️</p>
+
+
+    {% if fotograflar %}
+
+    <div class="galeri">
+
+        {% for fotograf in fotograflar %}
+
+        <div class="foto-karti" onclick="fotoAc(this)">
+
+            <img
+                src="{{ url_for('uploaded_file', filename=fotograf) }}"
+                alt="Aile anısı"
+            >
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <p>Henüz fotoğraf eklenmedi. 📷</p>
+
+    {% endif %}
+
+
+    <div id="fotoEkrani" class="foto-ekrani">
+
+        <div class="buyuk-foto-alani">
+
+            <img id="buyukFoto" src="data:," alt="">
+
+            <button class="kapat" onclick="fotoKapat()">×</button>
+
+        </div>
+
+        <button class="onceki" onclick="oncekiFoto()">‹</button>
+
+        <button class="sonraki" onclick="sonrakiFoto()">›</button>
+
+    </div>
+
+
+    <script>
+
+        let fotograflar = [];
+        let mevcutFoto = 0;
+
+        const kartlar = document.querySelectorAll(".foto-karti");
+
+        kartlar.forEach(function(kart) {
+
+            const resim = kart.querySelector("img");
+
+            fotograflar.push(resim.src);
+
+        });
+
+
+        function fotoAc(kart) {
+
+            const resim = kart.querySelector("img");
+
+            mevcutFoto = fotograflar.indexOf(resim.src);
+
+            document.getElementById("buyukFoto").src =
+                fotograflar[mevcutFoto];
+
+            document.getElementById("fotoEkrani")
+                .classList.add("aktif");
+        }
+
+
+        function fotoKapat() {
+
+            document.getElementById("fotoEkrani")
+                .classList.remove("aktif");
+
+            document.getElementById("buyukFoto").src = "data:,";
+        }
+
+
+        function oncekiFoto() {
+
+            if (fotograflar.length === 0) {
+                return;
+            }
+
+            mevcutFoto--;
+
+            if (mevcutFoto < 0) {
+                mevcutFoto = fotograflar.length - 1;
+            }
+
+            document.getElementById("buyukFoto").src =
+                fotograflar[mevcutFoto];
+        }
+
+
+        function sonrakiFoto() {
+
+            if (fotograflar.length === 0) {
+                return;
+            }
+
+            mevcutFoto++;
+
+            if (mevcutFoto >= fotograflar.length) {
+                mevcutFoto = 0;
+            }
+
+            document.getElementById("buyukFoto").src =
+                fotograflar[mevcutFoto];
+        }
+
+
+        document.addEventListener("keydown", function(event) {
+
+            if (event.key === "Escape") {
+                fotoKapat();
+            }
+
+            if (event.key === "ArrowLeft") {
+                oncekiFoto();
+            }
+
+            if (event.key === "ArrowRight") {
+                sonrakiFoto();
+            }
+
+        });
+
+
+        document.getElementById("fotoEkrani")
+            .addEventListener("click", function(event) {
+
+                if (event.target === this) {
+                    fotoKapat();
+                }
+
+            });
+
+    </script>
+
+</body>
+
+</html>
+

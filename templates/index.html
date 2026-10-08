@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Yıldırım Ailesi</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <nav>
+        <a href="/">Ana Sayfa</a>
+        <a href="/anilar">Anılar</a>
+    </nav>
+
+    <h1>Aile Anılarımız ❤️</h1>
+
+    {% if session.get("kullanici") %}
+
+        <p>Birlikte yaşadığımız güzel anıları burada biriktirelim.</p>
+
+        <button onclick="window.location.href='/anilar'">
+            Anılarımıza Git
+        </button>
+
+    {% else %}
+
+        <p>Ailemizin güzel anılarına göz atın. 💫</p>
+
+        <button onclick="window.location.href='/anilar'">
+            Anılara Git
+        </button>
+
+    {% endif %}
+
+</body>
+
+</html>

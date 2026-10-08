@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>Yıldırım Ailesi - Yönetim Paneli</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <h1>Yönetim Paneli 🔐</h1>
+
+
+    <!-- FOTOĞRAF YÜKLE -->
+
+    <section>
+
+        <h2>📸 Fotoğraf Yükle</h2>
+
+        <form
+            method="POST"
+            action="{{ url_for('fotograf_yukle') }}"
+            enctype="multipart/form-data"
+        >
+
+            <input
+                type="file"
+                id="fotoSec"
+                name="fotoğraf"
+                accept="image/*"
+                required
+                style="display: none;"
+            >
+
+            <button
+                type="button"
+                onclick="document.getElementById('fotoSec').click()"
+            >
+                📸 Fotoğraf Yükle
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- YÜKLENEN FOTOĞRAFLAR -->
+
+    <section>
+
+        <h2>🖼️ Yüklenen Fotoğraflar</h2>
+
+        {% if fotograflar %}
+
+        <div class="yonetim-galeri">
+
+            {% for fotograf in fotograflar %}
+
+            <div class="yonetim-foto">
+
+                <img
+                    src="{{ url_for('uploaded_file', filename=fotograf) }}"
+                    alt="Aile fotoğrafı"
+                >
+
+                <form
+                    method="POST"
+                    action="{{ url_for('fotograf_sil', filename=fotograf) }}"
+                    onsubmit="return confirm('Bu fotoğrafı silmek istediğine emin misin?');"
+                >
+
+                    <button
+                        type="submit"
+                        class="sil-butonu"
+                    >
+                        🗑️ Sil
+                    </button>
+
+                </form>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <p>Henüz fotoğraf yüklenmedi.</p>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- ŞİFRE DEĞİŞTİR -->
+
+    <section>
+
+        <button
+            type="button"
+            onclick="sifreAlaniniAc()"
+        >
+            🔑 Şifreyi Değiştir
+        </button>
+
+
+        <div
+            id="sifreAlani"
+            style="display: none; margin-top: 20px;"
+        >
+
+            <form
+                method="POST"
+                action="/sifre-degistir"
+            >
+
+                <input
+                    type="password"
+                    name="eski_sifre"
+                    placeholder="Mevcut şifre"
+                    required
+                >
+
+                <br><br>
+
+                <input
+                    type="password"
+                    name="yeni_sifre"
+                    placeholder="Yeni şifre"
+                    required
+                >
+
+                <br><br>
+
+                <input
+                    type="password"
+                    name="yeni_sifre_tekrar"
+                    placeholder="Yeni şifre tekrar"
+                    required
+                >
+
+                <br><br>
+
+                <button type="submit">
+                    Şifreyi Değiştir
+                </button>
+
+            </form>
+
+        </div>
+
+    </section>
+
+
+    <!-- ÇIKIŞ -->
+
+    <section>
+
+        <button onclick="window.location.href='/cikis'">
+            🚪 Çıkış Yap
+        </button>
+
+    </section>
+
+
+    <script>
+
+        document.getElementById("fotoSec").addEventListener("change", function() {
+
+            if (this.files.length > 0) {
+
+                this.form.submit();
+
+            }
+
+        });
+
+
+        function sifreAlaniniAc() {
+
+            const alan = document.getElementById("sifreAlani");
+
+            if (alan.style.display === "none") {
+
+                alan.style.display = "block";
+
+            } else {
+
+                alan.style.display = "none";
+
+            }
+
+        }
+
+    </script>
+
+</body>
+
+</html>

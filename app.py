@@ -31,6 +31,11 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def mevcut_sifre():
 
+    sifre = os.environ.get("ADMIN_PASSWORD")
+
+    if sifre:
+        return sifre
+
     if os.path.exists("sifre.txt"):
 
         with open(
@@ -39,10 +44,9 @@ def mevcut_sifre():
             encoding="utf-8"
         ) as dosya:
 
-            return dosya.read()
+            return dosya.read().strip()
 
-    return "kimsegiremezburaya152256"
-
+    return ""
 
 # --------------------------------------------------
 # ANA SAYFA

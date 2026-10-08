@@ -2,11 +2,13 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 import json
 import os
+import secrets
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-app.secret_key = "aile-sitemiz-gizli-anahtar"
+# Güvenli gizli anahtar
+app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 
 KULLANICI_ADI = "aile"
 AYAR_DOSYASI = "ayarlar.json"
@@ -177,4 +179,5 @@ def cikis():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=80)
+    port = int(os.environ.get("PORT", 80))
+    app.run(host="0.0.0.0", port=port, debug=False)
